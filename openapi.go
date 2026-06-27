@@ -42,6 +42,9 @@ type OpenAPI struct {
 	// The openapi field SHOULD be used by tooling to interpret the OpenAPI document.
 	// This is not related to the API info.version string.
 	OpenAPI string `json:"openapi" yaml:"openapi"`
+	// This string MUST be in the form of a URI reference as defined by RFC3986.
+	// The $self field provides the self-assigned URI of this document, which also serves as its base URI.
+	Self string `json:"$self,omitempty" yaml:"$self,omitempty"`
 	// A declaration of which security mechanisms can be used across the API.
 	// The list of values includes alternative security requirement objects that can be used.
 	// Only one of the security requirement objects need to be satisfied to authorize a request.
@@ -90,7 +93,7 @@ func (o *OpenAPI) validateSpec(location string, validator *Validator) []*validat
 	var errs []*validationError
 	if o.OpenAPI == "" {
 		errs = append(errs, newValidationError(joinLoc(location, "openapi"), ErrRequired))
-	} else if !strings.HasPrefix(o.OpenAPI, "3.1.") {
+	} else if !strings.HasPrefix(o.OpenAPI, "3.1.") && !strings.HasPrefix(o.OpenAPI, "3.2.") {
 		errs = append(errs, newValidationError(joinLoc(location, "openapi"), NewUnsupportedVersionError(o.OpenAPI)))
 	}
 	if o.Info == nil {
@@ -108,6 +111,9 @@ func (o *OpenAPI) validateSpec(location string, validator *Validator) []*validat
 
 	if err := checkURL(o.JsonSchemaDialect); err != nil {
 		errs = append(errs, newValidationError(joinLoc(location, "jsonSchemaDialect"), err))
+	}
+	if err := checkURL(o.Self); err != nil {
+		errs = append(errs, newValidationError(joinLoc(location, "$self"), err))
 	}
 	if o.Servers != nil {
 		for i, server := range o.Servers {
@@ -247,6 +253,11 @@ func (b *OpenAPIBuilder) AddWebHook(name string, path *RefOrSpec[Extendable[Path
 
 func (b *OpenAPIBuilder) JsonSchemaDialect(jsonSchemaDialect string) *OpenAPIBuilder {
 	b.spec.Spec.JsonSchemaDialect = jsonSchemaDialect
+	return b
+}
+
+func (b *OpenAPIBuilder) Self(self string) *OpenAPIBuilder {
+	b.spec.Spec.Self = self
 	return b
 }
 

@@ -59,6 +59,12 @@ type PathItem struct {
 	Patch *Extendable[Operation] `json:"patch,omitempty" yaml:"patch,omitempty"`
 	// A definition of a TRACE operation on this path.
 	Trace *Extendable[Operation] `json:"trace,omitempty" yaml:"trace,omitempty"`
+	// A definition of a QUERY operation on this path.
+	Query *Extendable[Operation] `json:"query,omitempty" yaml:"query,omitempty"`
+	// A map of additional operations on this path.
+	// The map key is the HTTP method with the same capitalization that is to be sent in the request.
+	// This map MUST NOT contain any entry for the methods that can be defined by other fixed fields.
+	AdditionalOperations map[string]*Extendable[Operation] `json:"additionalOperations,omitempty" yaml:"additionalOperations,omitempty"`
 	// An alternative server array to service all operations in this path.
 	Servers []*Extendable[Server] `json:"servers,omitempty" yaml:"servers,omitempty"`
 	// A list of parameters that are applicable for all the operations described under this path.
@@ -104,6 +110,14 @@ func (o *PathItem) validateSpec(location string, validator *Validator) []*valida
 	}
 	if o.Trace != nil {
 		errs = append(errs, o.Trace.validateSpec(joinLoc(location, "trace"), validator)...)
+	}
+	if o.Query != nil {
+		errs = append(errs, o.Query.validateSpec(joinLoc(location, "query"), validator)...)
+	}
+	if len(o.AdditionalOperations) > 0 {
+		for k, v := range o.AdditionalOperations {
+			errs = append(errs, v.validateSpec(joinLoc(location, "additionalOperations", k), validator)...)
+		}
 	}
 	return errs
 }
@@ -179,6 +193,24 @@ func (b *PathItemBuilder) Patch(v *Extendable[Operation]) *PathItemBuilder {
 
 func (b *PathItemBuilder) Trace(v *Extendable[Operation]) *PathItemBuilder {
 	b.spec.Spec.Spec.Trace = v
+	return b
+}
+
+func (b *PathItemBuilder) Query(v *Extendable[Operation]) *PathItemBuilder {
+	b.spec.Spec.Spec.Query = v
+	return b
+}
+
+func (b *PathItemBuilder) AdditionalOperations(v map[string]*Extendable[Operation]) *PathItemBuilder {
+	b.spec.Spec.Spec.AdditionalOperations = v
+	return b
+}
+
+func (b *PathItemBuilder) AddAdditionalOperation(method string, op *Extendable[Operation]) *PathItemBuilder {
+	if b.spec.Spec.Spec.AdditionalOperations == nil {
+		b.spec.Spec.Spec.AdditionalOperations = make(map[string]*Extendable[Operation], 1)
+	}
+	b.spec.Spec.Spec.AdditionalOperations[method] = op
 	return b
 }
 

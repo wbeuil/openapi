@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/sv-tools/openapi"
+	"github.com/wbeuil/openapi"
 )
 
 func TestComponents_Add(t *testing.T) {

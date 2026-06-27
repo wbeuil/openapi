@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/sv-tools/openapi"
+	"github.com/wbeuil/openapi"
 )
 
 type Simple struct {
@@ -29,7 +29,7 @@ type Complex struct {
 }
 
 type SimpleByRef struct {
-	S Simple `json:"s" openapi:"s,required,title:Simple By Ref,ref:#/components/schemas/github.com.sv-tools.openapi_test.Simple" yaml:"s"`
+	S Simple `json:"s" openapi:"s,required,title:Simple By Ref,ref:#/components/schemas/github.com.wbeuil.openapi_test.Simple" yaml:"s"`
 }
 
 func TestParseObject(t *testing.T) {
@@ -320,9 +320,9 @@ func TestParseObject(t *testing.T) {
 				Fa:  []any{"435", 42, false},
 				fp:  "baz",
 			},
-			expected: openapi.NewSchemaBuilder().Ref("#/components/schemas/github.com.sv-tools.openapi_test.Simple").Build(),
+			expected: openapi.NewSchemaBuilder().Ref("#/components/schemas/github.com.wbeuil.openapi_test.Simple").Build(),
 			expectedComponents: openapi.NewComponents().Spec.Add(
-				"github.com.sv-tools.openapi_test.Simple",
+				"github.com.wbeuil.openapi_test.Simple",
 				openapi.NewSchemaBuilder().
 					Type(openapi.ObjectType).
 					AddProperty("fs", openapi.NewSchemaBuilder().Type(openapi.StringType).GoType("string").Format("password").Build()).
@@ -342,7 +342,7 @@ func TestParseObject(t *testing.T) {
 						GoType("any").Build(),
 					).
 					AddRequired("Fm").
-					GoPackage("github.com/sv-tools/openapi_test").GoType("openapi_test.Simple").Build(),
+					GoPackage("github.com/wbeuil/openapi_test").GoType("openapi_test.Simple").Build(),
 			),
 		},
 		{
@@ -359,26 +359,26 @@ func TestParseObject(t *testing.T) {
 				},
 				Next: &Complex{},
 			},
-			expected: openapi.NewSchemaBuilder().Ref("#/components/schemas/github.com.sv-tools.openapi_test.Complex").Build(),
+			expected: openapi.NewSchemaBuilder().Ref("#/components/schemas/github.com.wbeuil.openapi_test.Complex").Build(),
 			expectedComponents: openapi.NewComponents().Spec.Add(
-				"github.com.sv-tools.openapi_test.Complex",
+				"github.com.wbeuil.openapi_test.Complex",
 				openapi.NewSchemaBuilder().
 					AllOf(
-						openapi.NewSchemaBuilder().Ref("#/components/schemas/github.com.sv-tools.openapi_test.Simple").Build(),
+						openapi.NewSchemaBuilder().Ref("#/components/schemas/github.com.wbeuil.openapi_test.Simple").Build(),
 						openapi.NewSchemaBuilder().
 							Type(openapi.ObjectType).
 							AddProperty("Next", openapi.NewSchemaBuilder().
 								OneOf(
-									openapi.NewSchemaBuilder().Ref("#/components/schemas/github.com.sv-tools.openapi_test.Complex").Build(),
+									openapi.NewSchemaBuilder().Ref("#/components/schemas/github.com.wbeuil.openapi_test.Complex").Build(),
 									openapi.NewSchemaBuilder().Type(openapi.NullType).Build(),
 								).
 								Build(),
 							).
 							Build(),
 					).
-					GoPackage("github.com/sv-tools/openapi_test").GoType("openapi_test.Complex").Build(),
+					GoPackage("github.com/wbeuil/openapi_test").GoType("openapi_test.Complex").Build(),
 			).Add(
-				"github.com.sv-tools.openapi_test.Simple",
+				"github.com.wbeuil.openapi_test.Simple",
 				openapi.NewSchemaBuilder().
 					Type(openapi.ObjectType).
 					AddProperty("fs", openapi.NewSchemaBuilder().Type(openapi.StringType).GoType("string").Format("password").Build()).
@@ -398,7 +398,7 @@ func TestParseObject(t *testing.T) {
 						GoType("any").Build(),
 					).
 					AddRequired("Fm").
-					GoPackage("github.com/sv-tools/openapi_test").GoType("openapi_test.Simple").Build(),
+					GoPackage("github.com/wbeuil/openapi_test").GoType("openapi_test.Simple").Build(),
 			),
 		},
 		{
@@ -406,16 +406,16 @@ func TestParseObject(t *testing.T) {
 			obj: SimpleByRef{
 				S: Simple{},
 			},
-			expected: openapi.NewSchemaBuilder().Ref("#/components/schemas/github.com.sv-tools.openapi_test.SimpleByRef").Build(),
+			expected: openapi.NewSchemaBuilder().Ref("#/components/schemas/github.com.wbeuil.openapi_test.SimpleByRef").Build(),
 			expectedComponents: openapi.NewComponents().Spec.Add(
-				"github.com.sv-tools.openapi_test.SimpleByRef",
+				"github.com.wbeuil.openapi_test.SimpleByRef",
 				openapi.NewSchemaBuilder().
 					Type(openapi.ObjectType).
-					AddProperty("s", openapi.NewSchemaBuilder().Ref("#/components/schemas/github.com.sv-tools.openapi_test.Simple").Title("Simple By Ref").Build()).
+					AddProperty("s", openapi.NewSchemaBuilder().Ref("#/components/schemas/github.com.wbeuil.openapi_test.Simple").Title("Simple By Ref").Build()).
 					Required("s").
-					GoPackage("github.com/sv-tools/openapi_test").GoType("openapi_test.SimpleByRef").Build(),
+					GoPackage("github.com/wbeuil/openapi_test").GoType("openapi_test.SimpleByRef").Build(),
 			).Add(
-				"github.com.sv-tools.openapi_test.Simple",
+				"github.com.wbeuil.openapi_test.Simple",
 				openapi.NewSchemaBuilder().
 					Type(openapi.ObjectType).
 					AddProperty("fs", openapi.NewSchemaBuilder().Type(openapi.StringType).GoType("string").Format("password").Build()).
@@ -435,7 +435,7 @@ func TestParseObject(t *testing.T) {
 						GoType("any").Build(),
 					).
 					AddRequired("Fm").
-					GoPackage("github.com/sv-tools/openapi_test").GoType("openapi_test.Simple").Build(),
+					GoPackage("github.com/wbeuil/openapi_test").GoType("openapi_test.Simple").Build(),
 			),
 		},
 	} {

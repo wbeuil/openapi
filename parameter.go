@@ -26,6 +26,10 @@ const (
 	//
 	// https://spec.openapis.org/oas/v3.1.1#parameter-locations
 	InCookie = "cookie"
+	// InQueryString treats the entire URL query string as a value which MUST be specified using the content field.
+	//
+	// https://spec.openapis.org/oas/v3.2.0#parameter-locations
+	InQueryString = "querystring"
 
 	// StyleMatrix is the parameters defined by [RFC6570](https://www.rfc-editor.org/rfc/rfc6570#section-3.2.7)
 	//
@@ -199,11 +203,11 @@ func (o *Parameter) validateSpec(location string, validator *Validator) []*valid
 	}
 
 	switch o.In {
-	case InQuery, InHeader, InPath, InCookie:
+	case InQuery, InHeader, InPath, InCookie, InQueryString:
 	case "":
 		errs = append(errs, newValidationError(joinLoc(location, "in"), ErrRequired))
 	default:
-		errs = append(errs, newValidationError(joinLoc(location, "in"), "invalid value, expected one of [%s, %s, %s, %s], but got '%s'", InQuery, InHeader, InPath, InCookie, o.In))
+		errs = append(errs, newValidationError(joinLoc(location, "in"), "invalid value, expected one of [%s, %s, %s, %s, %s], but got '%s'", InQuery, InHeader, InPath, InCookie, InQueryString, o.In))
 	}
 
 	switch o.Style {

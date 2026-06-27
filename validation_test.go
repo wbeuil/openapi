@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.yaml.in/yaml/v4"
 
-	"github.com/sv-tools/openapi"
+	"github.com/wbeuil/openapi"
 )
 
 func TestValidator_ValidateSpec(t *testing.T) {

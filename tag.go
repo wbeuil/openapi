@@ -15,9 +15,15 @@ type Tag struct {
 	// REQUIRED.
 	// The name of the tag.
 	Name string `json:"name" yaml:"name"`
+	// A short summary of the tag, used for display purposes.
+	Summary string `json:"summary,omitempty" yaml:"summary,omitempty"`
 	// A description for the tag.
 	// CommonMark syntax MAY be used for rich text representation.
 	Description string `json:"description,omitempty" yaml:"description,omitempty"`
+	// The name of a tag that this tag is nested under.
+	Parent string `json:"parent,omitempty" yaml:"parent,omitempty"`
+	// A machine-readable string to categorize what sort of tag it is.
+	Kind string `json:"kind,omitempty" yaml:"kind,omitempty"`
 }
 
 func (o *Tag) validateSpec(location string, validator *Validator) []*validationError {
@@ -68,5 +74,20 @@ func (b *TagBuilder) Name(v string) *TagBuilder {
 
 func (b *TagBuilder) Description(v string) *TagBuilder {
 	b.spec.Spec.Description = v
+	return b
+}
+
+func (b *TagBuilder) Summary(v string) *TagBuilder {
+	b.spec.Spec.Summary = v
+	return b
+}
+
+func (b *TagBuilder) Parent(v string) *TagBuilder {
+	b.spec.Spec.Parent = v
+	return b
+}
+
+func (b *TagBuilder) Kind(v string) *TagBuilder {
+	b.spec.Spec.Kind = v
 	return b
 }

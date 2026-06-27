@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.yaml.in/yaml/v4"
 
-	"github.com/sv-tools/openapi"
+	"github.com/wbeuil/openapi"
 )
 
 type testRefOrSpec struct {

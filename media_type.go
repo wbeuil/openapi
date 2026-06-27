@@ -31,11 +31,13 @@ package openapi
 type MediaType struct {
 	// The schema defining the content of the request, response, or parameter.
 	Schema *RefOrSpec[Schema] `json:"schema,omitempty" yaml:"schema,omitempty"`
+	// A schema describing each item within a sequential media type.
+	ItemSchema *RefOrSpec[Schema] `json:"itemSchema,omitempty" yaml:"itemSchema,omitempty"`
 	// Example of the media type. The example object SHOULD be in the correct format as specified by the media type.
 	// The example field is mutually exclusive of the examples field.
 	// Furthermore, if referencing a schema which contains an example, the example value SHALL override the example provided by the schema.
 	Example any `json:"example,omitempty" yaml:"example,omitempty"`
-	// Examples of the parameter’s potential value.
+	// Examples of the parameter's potential value.
 	// Each example SHOULD contain a value in the correct format as specified in the parameter encoding.
 	// The examples field is mutually exclusive of the example field.
 	// Furthermore, if referencing a schema that contains an example, the examples value SHALL override the example provided by the schema.
@@ -44,6 +46,12 @@ type MediaType struct {
 	// The key, being the property name, MUST exist in the schema as a property.
 	// The encoding object SHALL only apply to requestBody objects when the media type is multipart or application/x-www-form-urlencoded.
 	Encoding map[string]*Extendable[Encoding] `json:"encoding,omitempty" yaml:"encoding,omitempty"`
+	// An array of positional encoding information.
+	// The prefixEncoding field SHALL only apply when the media type is multipart.
+	PrefixEncoding []*Extendable[Encoding] `json:"prefixEncoding,omitempty" yaml:"prefixEncoding,omitempty"`
+	// A single Encoding Object that provides encoding information for multiple array items.
+	// The itemEncoding field SHALL only apply when the media type is multipart.
+	ItemEncoding *Extendable[Encoding] `json:"itemEncoding,omitempty" yaml:"itemEncoding,omitempty"`
 }
 
 func (o *MediaType) validateSpec(location string, validator *Validator) []*validationError {
@@ -51,10 +59,21 @@ func (o *MediaType) validateSpec(location string, validator *Validator) []*valid
 	if o.Schema != nil {
 		errs = append(errs, o.Schema.validateSpec(joinLoc(location, "schema"), validator)...)
 	}
+	if o.ItemSchema != nil {
+		errs = append(errs, o.ItemSchema.validateSpec(joinLoc(location, "itemSchema"), validator)...)
+	}
 	if len(o.Encoding) > 0 {
 		for k, v := range o.Encoding {
 			errs = append(errs, v.validateSpec(joinLoc(location, "encoding", k), validator)...)
 		}
+	}
+	if len(o.PrefixEncoding) > 0 {
+		for i, v := range o.PrefixEncoding {
+			errs = append(errs, v.validateSpec(joinLoc(location, "prefixEncoding", i), validator)...)
+		}
+	}
+	if o.ItemEncoding != nil {
+		errs = append(errs, o.ItemEncoding.validateSpec(joinLoc(location, "itemEncoding"), validator)...)
 	}
 	if o.Example != nil && len(o.Examples) > 0 {
 		errs = append(errs, newValidationError(joinLoc(location, "example&examples"), ErrMutuallyExclusive))
@@ -124,6 +143,11 @@ func (b *MediaTypeBuilder) Schema(v *RefOrSpec[Schema]) *MediaTypeBuilder {
 	return b
 }
 
+func (b *MediaTypeBuilder) ItemSchema(v *RefOrSpec[Schema]) *MediaTypeBuilder {
+	b.spec.Spec.ItemSchema = v
+	return b
+}
+
 func (b *MediaTypeBuilder) Example(v any) *MediaTypeBuilder {
 	b.spec.Spec.Example = v
 	return b
@@ -152,5 +176,20 @@ func (b *MediaTypeBuilder) AddEncoding(name string, value *Extendable[Encoding])
 		b.spec.Spec.Encoding = make(map[string]*Extendable[Encoding], 1)
 	}
 	b.spec.Spec.Encoding[name] = value
+	return b
+}
+
+func (b *MediaTypeBuilder) PrefixEncoding(v ...*Extendable[Encoding]) *MediaTypeBuilder {
+	b.spec.Spec.PrefixEncoding = v
+	return b
+}
+
+func (b *MediaTypeBuilder) AddPrefixEncoding(v ...*Extendable[Encoding]) *MediaTypeBuilder {
+	b.spec.Spec.PrefixEncoding = append(b.spec.Spec.PrefixEncoding, v...)
+	return b
+}
+
+func (b *MediaTypeBuilder) ItemEncoding(v *Extendable[Encoding]) *MediaTypeBuilder {
+	b.spec.Spec.ItemEncoding = v
 	return b
 }
