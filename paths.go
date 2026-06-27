@@ -86,5 +86,5 @@ func (o *Paths) Add(path string, item *RefOrSpec[Extendable[PathItem]]) *Paths {
 }
 
 func NewPaths() *Extendable[Paths] {
-	return NewExtendable[Paths](&Paths{})
+	return NewExtendable[Paths](&Paths{Paths: make(map[string]*RefOrSpec[Extendable[PathItem]])})
 }
